@@ -13,6 +13,17 @@
         SELECT *
         FROM comment
         WHERE
+        <if test="source != null and source != ''">
+            AND source = #{source}
+        </if>
+        <if test="type != null and type != ''">
+            AND type = #{type}
+        </if>
+        <if test="firstComment != null and firstComment != ''">
+            AND parent_user_id = #{firstComment}
+        </if>
+        ORDER BY create_time ASC
     </select>
+
 
 </mapper>

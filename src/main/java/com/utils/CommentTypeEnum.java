@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
  */
 public enum CommentTypeEnum {
 
-    COMMENT_TYPE_ARTICLE("article", "文章评论");
+    COMMENT_TYPE_HOTEL("hotel", "酒店");
 
 
     private final String code;

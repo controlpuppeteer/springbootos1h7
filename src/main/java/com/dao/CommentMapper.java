@@ -19,5 +19,8 @@ public interface CommentMapper extends BaseMapper<Comment> {
     Integer selectCount(@Param("source") Integer source,@Param("type") String type);
 
 
-    List<Comment> selectCommentList(@Param("pageSize") Integer pageSize);
+    List<Comment> selectCommentList(@Param("source") Integer source,@Param("type") String type, @Param("firstComment")int firstComment);
+
+
+
 }

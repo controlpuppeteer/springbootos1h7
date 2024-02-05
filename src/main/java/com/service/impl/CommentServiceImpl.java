@@ -1,24 +1,33 @@
 package com.service.impl;
 
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.common.PoetryResult;
 import com.common.Result;
 import com.dao.CommentMapper;
+import com.dao.HuiyuanDao;
+import com.dao.KefangxinxiDao;
 import com.entity.Comment;
+import com.entity.HuiyuanEntity;
+import com.entity.KefangxinxiEntity;
+import com.entity.vo.CommentVO;
 import com.req.BaseRequestVO;
 import com.req.CommentReq;
 
 import com.service.ICommentService;
 import com.utils.CommentTypeEnum;
-import com.utils.PageUtil;
-import org.apache.ibatis.annotations.Param;
+import com.utils.CommonConst;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
-import java.sql.Wrapper;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -34,6 +43,10 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
     @Resource
     private CommentMapper commentMapper;
+    @Resource
+    KefangxinxiDao kefangxinxiDao;
+    @Resource
+    HuiyuanDao huiyuanDao;
 
     @Override
     public Result saveComment(CommentReq commentReq) {
@@ -64,16 +77,69 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
 
     @Override
-    public Result listComment(@RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
-                              @RequestParam(name = "pageNum", defaultValue = "1") Integer pageNum,
-                              BaseRequestVO baseRequestVO) {
-        if (null != baseRequestVO.getSource()){
-            List<Comment> commentList=commentMapper.selectCommentList(baseRequestVO.getSource());
+    public PoetryResult<BaseRequestVO> listComment(BaseRequestVO baseRequestVO) {
+        if (CommentTypeEnum.COMMENT_TYPE_HOTEL.getCode().equals(baseRequestVO.getCommentType())) {
+            KefangxinxiEntity kefangxinxiEntity = kefangxinxiDao.selectById(baseRequestVO.getSource());
+            if (kefangxinxiEntity.getCommentStatus() != null && !kefangxinxiEntity.getCommentStatus()) {
+                return PoetryResult.fail("评论功能已关闭！");
+            }
         }
-        //TODO查询出评论的集合，使用工具类分页，mp版本太低用不惯
-        PageUtil<BaseRequestVO> pageUtil = new PageUtil<>(pageNum, pageSize, commentList);
-        return Result(pageUtil.getPageList());
+
+        if (baseRequestVO.getFloorCommentId() == null) {
+            List<Comment> comments = commentMapper.selectCommentList(baseRequestVO.getSource(), baseRequestVO.getType(), CommonConst.FIRST_COMMENT);
+            if (CollectionUtils.isEmpty(comments)) {
+                PoetryResult.success(baseRequestVO);
+            }
+            List<CommentVO> commentVOs = comments.stream().map(c -> {
+                CommentVO commentVO = buildCommentVO(c);
+                Page page = new Page(1, 5);
+                EntityWrapper<Comment> entityWrapper = new EntityWrapper<>();
+                entityWrapper.eq("source", baseRequestVO.getSource())
+                        .eq("type", baseRequestVO.getCommentType())
+                        .eq("floor_comment_id", c.getId())
+                        .orderBy("create_time", true); // true 表示升序
+                List<Comment> childComments = page.getRecords();
+                if (childComments != null) {
+                    List<CommentVO> ccVO = childComments.stream().map(cc -> buildCommentVO(cc)).collect(Collectors.toList());
+                    page.setRecords(ccVO);
+                }
+                commentVO.setChildComments(page);
+                return commentVO;
+            }).collect(Collectors.toList());
+            baseRequestVO.setRecords(commentVOs);
+        } else {
+            EntityWrapper<Comment> entityWrapper = new EntityWrapper<>();
+            entityWrapper.eq("source", baseRequestVO.getSource())
+                    .eq("type", baseRequestVO.getCommentType())
+                    .eq("floor_comment_id", baseRequestVO.getFloorCommentId())
+                    .orderBy("create_time", true); // true 表示升序
+            List<Comment> childComments = baseRequestVO.getRecords();
+            if (CollectionUtils.isEmpty(childComments)) {
+                PoetryResult.success(baseRequestVO);
+            }
+            List<CommentVO> ccVO = childComments.stream().map(cc -> buildCommentVO(cc)).collect(Collectors.toList());
+            baseRequestVO.setRecords(ccVO);
+        }
+
+        return PoetryResult.success(baseRequestVO);
     }
 
 
+
+    private CommentVO buildCommentVO(Comment c) {
+        CommentVO commentVO = new CommentVO();
+        BeanUtils.copyProperties(c, commentVO);
+        HuiyuanEntity huiyuanEntity = huiyuanDao.selectById(c.getSource());
+        if (huiyuanEntity != null) {
+            commentVO.setAvatar(huiyuanEntity.getTouxiang());
+            commentVO.setUsername(huiyuanEntity.getXingming());
+        }
+        if (commentVO.getParentUserId() != null) {
+
+            if (huiyuanEntity != null) {
+                commentVO.setParentUsername(huiyuanEntity.getXingming());
+            }
+        }
+        return commentVO;
+    }
 }

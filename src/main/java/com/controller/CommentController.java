@@ -2,8 +2,12 @@ package com.controller;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
+import com.common.PoetryResult;
 import com.common.Result;
+import com.common.constant.HttpStatus;
+import com.entity.Comment;
 import com.entity.KefangxinxiEntity;
+import com.page.TableDataInfo;
 import com.req.BaseRequestVO;
 import com.req.CommentReq;
 import com.service.ICommentService;
@@ -14,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 
 /**
@@ -69,10 +74,8 @@ public class CommentController {
      * 查询评论
      */
     @PostMapping("/listComment")
-    public Result<BaseRequestVO> listComment(@RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
-                                             @RequestParam(name = "pageNum", defaultValue = "1") Integer pageNum,
-                                             @RequestBody BaseRequestVO baseRequestVO) {
-        return commentService.listComment(pageSize,pageNum,baseRequestVO);
+    public PoetryResult<BaseRequestVO> listComment(@RequestBody BaseRequestVO baseRequestVO) {
+        return commentService.listComment(baseRequestVO);
     }
 }
 
