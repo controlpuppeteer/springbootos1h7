@@ -26,8 +26,6 @@ import java.util.List;
  * 文章评论表 前端控制器
  * </p>
  *
- * @author sara
- * @since 2021-08-13
  */
 @RestController
 @RequestMapping("/comment")

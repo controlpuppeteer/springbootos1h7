@@ -35,8 +35,6 @@ import java.util.stream.Collectors;
  * 文章评论表 服务实现类
  * </p>
  *
- * @author sara
- * @since 2021-08-13
  */
 @Service
 public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> implements ICommentService {
