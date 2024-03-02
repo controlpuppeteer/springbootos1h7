@@ -19,31 +19,37 @@
         <result property="clicktime" column="clicktime"/>
         <result property="clicknum" column="clicknum"/>
     </resultMap>
+    <update id="updateCommentStatusById">
+        UPDATE kefangxinxi
+        SET comment_status = #{status}
+        WHERE id = #{kefangId}
+    </update>
 
-	<select id="selectListVO"
+
+    <select id="selectListVO"
 		resultType="com.entity.vo.KefangxinxiVO" >
-		SELECT * FROM kefangxinxi  kefangxinxi         
+		SELECT * FROM kefangxinxi  kefangxinxi
         <where> 1=1 ${ew.sqlSegment}</where>
 	</select>
-	
+
 	<select id="selectVO"
 		resultType="com.entity.vo.KefangxinxiVO" >
-		SELECT  kefangxinxi.* FROM kefangxinxi  kefangxinxi 	
+		SELECT  kefangxinxi.* FROM kefangxinxi  kefangxinxi
  		<where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 
     <select id="selectListView"
 		resultType="com.entity.view.KefangxinxiView" >
 
-		SELECT  kefangxinxi.* FROM kefangxinxi  kefangxinxi 	        
+		SELECT  kefangxinxi.* FROM kefangxinxi  kefangxinxi
         <where> 1=1 ${ew.sqlSegment}</where>
 	</select>
-	
+
 	<select id="selectView"
 		resultType="com.entity.view.KefangxinxiView" >
 		SELECT * FROM kefangxinxi  kefangxinxi <where> 1=1 ${ew.sqlSegment}</where>
 	</select>
-	
+
 
     <select id="selectValue" resultType="map" >
         SELECT ${params.xColumn}, sum(${params.yColumn}) total FROM kefangxinxi

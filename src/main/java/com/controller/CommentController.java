@@ -1,13 +1,8 @@
 package com.controller;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
+
 import com.common.PoetryResult;
 import com.common.Result;
-import com.common.constant.HttpStatus;
-import com.entity.Comment;
-import com.entity.KefangxinxiEntity;
-import com.page.TableDataInfo;
 import com.req.BaseRequestVO;
 import com.req.CommentReq;
 import com.service.ICommentService;
@@ -18,7 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.List;
+
 
 
 /**
@@ -45,9 +40,8 @@ public class CommentController {
             return Result.failed("评论内容不合法！");
         }
         commentReq.setCommentContent(content);
-
         CacheUtil.remove(CommonConst.COMMENT_COUNT_CACHE + commentReq.getSource().toString() + "_" + commentReq.getType());
-        return Result.ok();
+        return   commentService.saveComment(commentReq);
     }
 
     /**

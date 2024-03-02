@@ -1,5 +1,6 @@
 package com.service.impl;
 
+import com.utils.R;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.List;
@@ -20,8 +21,8 @@ import com.entity.view.KefangxinxiView;
 
 @Service("kefangxinxiService")
 public class KefangxinxiServiceImpl extends ServiceImpl<KefangxinxiDao, KefangxinxiEntity> implements KefangxinxiService {
-	
-	
+
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         Page<KefangxinxiEntity> page = this.selectPage(
@@ -30,7 +31,7 @@ public class KefangxinxiServiceImpl extends ServiceImpl<KefangxinxiDao, Kefangxi
         );
         return new PageUtils(page);
     }
-    
+
     @Override
 	public PageUtils queryPage(Map<String, Object> params, Wrapper<KefangxinxiEntity> wrapper) {
 		  Page<KefangxinxiView> page =new Query<KefangxinxiView>(params).getPage();
@@ -38,17 +39,17 @@ public class KefangxinxiServiceImpl extends ServiceImpl<KefangxinxiDao, Kefangxi
 	    	PageUtils pageUtil = new PageUtils(page);
 	    	return pageUtil;
  	}
-    
+
     @Override
 	public List<KefangxinxiVO> selectListVO(Wrapper<KefangxinxiEntity> wrapper) {
  		return baseMapper.selectListVO(wrapper);
 	}
-	
+
 	@Override
 	public KefangxinxiVO selectVO(Wrapper<KefangxinxiEntity> wrapper) {
  		return baseMapper.selectVO(wrapper);
 	}
-	
+
 	@Override
 	public List<KefangxinxiView> selectListView(Wrapper<KefangxinxiEntity> wrapper) {
 		return baseMapper.selectListView(wrapper);
@@ -74,7 +75,10 @@ public class KefangxinxiServiceImpl extends ServiceImpl<KefangxinxiDao, Kefangxi
         return baseMapper.selectGroup(params, wrapper);
     }
 
-
+	@Override
+	public R updateCommentStatusById(Integer kefangId, Integer status) {
+		return R.ok(baseMapper.updateCommentStatusById(kefangId,status));
+	}
 
 
 }

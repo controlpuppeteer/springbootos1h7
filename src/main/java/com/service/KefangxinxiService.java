@@ -7,6 +7,7 @@ import com.entity.KefangxinxiEntity;
 import java.util.List;
 import java.util.Map;
 import com.entity.vo.KefangxinxiVO;
+import com.utils.R;
 import org.apache.ibatis.annotations.Param;
 import com.entity.view.KefangxinxiView;
 
@@ -14,24 +15,24 @@ import com.entity.view.KefangxinxiView;
 /**
  * 客房信息
  *
- * @author 
- * @email 
+ * @author
+ * @email
  * @date 2023-02-23 11:38:12
  */
 public interface KefangxinxiService extends IService<KefangxinxiEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
-    
+
    	List<KefangxinxiVO> selectListVO(Wrapper<KefangxinxiEntity> wrapper);
-   	
+
    	KefangxinxiVO selectVO(@Param("ew") Wrapper<KefangxinxiEntity> wrapper);
-   	
+
    	List<KefangxinxiView> selectListView(Wrapper<KefangxinxiEntity> wrapper);
-   	
+
    	KefangxinxiView selectView(@Param("ew") Wrapper<KefangxinxiEntity> wrapper);
-   	
+
    	PageUtils queryPage(Map<String, Object> params,Wrapper<KefangxinxiEntity> wrapper);
-   	
+
 
     List<Map<String, Object>> selectValue(Map<String, Object> params,Wrapper<KefangxinxiEntity> wrapper);
 
@@ -40,6 +41,6 @@ public interface KefangxinxiService extends IService<KefangxinxiEntity> {
     List<Map<String, Object>> selectGroup(Map<String, Object> params,Wrapper<KefangxinxiEntity> wrapper);
 
 
-
+    R updateCommentStatusById(Integer kefangId, Integer status);
 }
 
