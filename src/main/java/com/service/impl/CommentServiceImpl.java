@@ -25,6 +25,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,15 +52,16 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         if (CommentTypeEnum.getEnumByCode(commentReq.getType()) == null) {
             return Result.failed("评论来源类型不存在！");
         }
-        Comment comment = Comment.builder()
-                .source(commentReq.getSource())
-                .type(commentReq.getType())
-                .commentContent(commentReq.getCommentContent())
-                .parentCommentId(commentReq.getParentCommentId())
-                .floorCommentId(commentReq.getFloorCommentId())
-                .parentUserId(commentReq.getParentUserId())
-                .userId(commentReq.getUserId())
-                .build();
+        Comment comment = null;
+        comment.setSource(commentReq.getSource());
+        comment.setType(commentReq.getType());
+        comment.setCommentContent(commentReq.getCommentContent());
+        comment.setParentCommentId(commentReq.getParentCommentId());
+        comment.setFloorCommentId(commentReq.getFloorCommentId());
+        comment.setParentUserId(commentReq.getParentUserId());
+        comment.setUserId(commentReq.getUserId());
+        comment.setCreateTime(LocalDateTime.now());
+
         if (StringUtils.hasText(commentReq.getCommentInfo())) {
             comment.setCommentInfo(commentReq.getCommentInfo());
         }
@@ -76,7 +78,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
     @Override
     public PoetryResult<BaseRequestVO> listComment(BaseRequestVO baseRequestVO) {
-        if (CommentTypeEnum.COMMENT_TYPE_HOTEL.getCode().equals(baseRequestVO.getCommentType())) {
+        if (CommentTypeEnum.COMMENT_TYPE_HOTEL.getCode().equals(baseRequestVO.getType())) {
             KefangxinxiEntity kefangxinxiEntity = kefangxinxiDao.selectById(baseRequestVO.getSource());
             if (kefangxinxiEntity.getCommentStatus() != null && !kefangxinxiEntity.getCommentStatus()) {
                 return PoetryResult.fail("评论功能已关闭！");
@@ -86,17 +88,12 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         if (baseRequestVO.getFloorCommentId() == null) {
             List<Comment> comments = commentMapper.selectCommentList(baseRequestVO.getSource(), baseRequestVO.getType(), CommonConst.FIRST_COMMENT);
             if (CollectionUtils.isEmpty(comments)) {
-                PoetryResult.success(baseRequestVO);
+                return   PoetryResult.success(baseRequestVO);
             }
             List<CommentVO> commentVOs = comments.stream().map(c -> {
                 CommentVO commentVO = buildCommentVO(c);
                 Page page = new Page(1, 5);
-                EntityWrapper<Comment> entityWrapper = new EntityWrapper<>();
-                entityWrapper.eq("source", baseRequestVO.getSource())
-                        .eq("type", baseRequestVO.getCommentType())
-                        .eq("floor_comment_id", c.getId())
-                        .orderBy("create_time", true); // true 表示升序
-                List<Comment> childComments = page.getRecords();
+                List<Comment> childComments =  commentMapper.selectToPage( baseRequestVO.getSource(), baseRequestVO.getType(), c.getId());
                 if (childComments != null) {
                     List<CommentVO> ccVO = childComments.stream().map(cc -> buildCommentVO(cc)).collect(Collectors.toList());
                     page.setRecords(ccVO);
@@ -108,7 +105,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         } else {
             EntityWrapper<Comment> entityWrapper = new EntityWrapper<>();
             entityWrapper.eq("source", baseRequestVO.getSource())
-                    .eq("type", baseRequestVO.getCommentType())
+                    .eq("type", baseRequestVO.getType())
                     .eq("floor_comment_id", baseRequestVO.getFloorCommentId())
                     .orderBy("create_time", true); // true 表示升序
             List<Comment> childComments = baseRequestVO.getRecords();
@@ -127,7 +124,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     private CommentVO buildCommentVO(Comment c) {
         CommentVO commentVO = new CommentVO();
         BeanUtils.copyProperties(c, commentVO);
-        HuiyuanEntity huiyuanEntity = huiyuanDao.selectById(c.getSource());
+        HuiyuanEntity huiyuanEntity = huiyuanDao.selectById(c.getUserId());
         if (huiyuanEntity != null) {
             commentVO.setAvatar(huiyuanEntity.getTouxiang());
             commentVO.setUsername(huiyuanEntity.getXingming());

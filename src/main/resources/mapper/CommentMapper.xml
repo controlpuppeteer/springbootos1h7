@@ -2,17 +2,25 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.dao.CommentMapper">
-
-
     <select id="selectCount" resultType="java.lang.Integer">
         SELECT COUNT(*)
          FROM comment
       WHERE source = #{source} AND type = #{type}
     </select>
-    <select id="selectCommentList" resultType="com.entity.Comment">
+    <select id="selectCommentList"  resultType="comment">
+#         SELECT cm.id   id,
+#                cm.source  source,
+#                cm.type    type,
+#                cm.parent_comment_id  parentCommentId,
+#                cm.user_id userId,
+#                cm.floor_comment_id floorCommentId,
+#                cm.parent_user_id parentUserId,
+#                cm.like_count  likeCount,
+#                cm.comment_content  commentContent,
+#                cm.create_time createTime,
         SELECT *
         FROM comment
-        WHERE
+        <where>
         <if test="source != null and source != ''">
             AND source = #{source}
         </if>
@@ -22,6 +30,24 @@
         <if test="firstComment != null and firstComment != ''">
             AND parent_user_id = #{firstComment}
         </if>
+        </where>
+        ORDER BY create_time ASC
+    </select>
+
+    <select id="selectToPage" resultType="com.entity.Comment">
+        SELECT *
+        FROM comment
+        <where>
+            <if test="source != null and source != ''">
+                AND source = #{source}
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+            <if test="floorCommentId != null and floorCommentId != ''">
+                AND floor_comment_id = #{floorCommentId}
+            </if>
+        </where>
         ORDER BY create_time ASC
     </select>
 

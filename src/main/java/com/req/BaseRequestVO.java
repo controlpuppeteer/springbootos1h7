@@ -3,47 +3,24 @@ package com.req;
 
 import com.baomidou.mybatisplus.plugins.Page;
 import lombok.Data;
+import java.time.LocalDateTime;
 
 @Data
 public class BaseRequestVO extends Page {
 
-    private String order;
-
-    private boolean desc = true;
-    /**
-     * 评论来源标识
-     */
+    private Long id;
     private Integer source;
-
     private String type;
-
-    private String commentType;
-
-    private Integer floorCommentId;
-
-    private String searchKey;
-
-    private String articleSearch;
-
-    // 是否推荐[0:否，1:是]
-    private Boolean recommendStatus;
-
-    private Integer sortId;
-
-    private Integer labelId;
-
-    private Boolean userStatus;
-
-    private Integer userType;
-
-    private Integer userId;
-
-    private String resourceType;
-
-    private Boolean status;
-
-    private String classify;
-
+    private Long parentCommentId;
+    private Long userId;
+    private Long floorCommentId;
+    private Long parentUserId;
+    private Integer likeCount;
+    private String commentContent;
+    private LocalDateTime createTime;
+    private String zhangHao;
+    private String xingMing;
+    private String touXiang;
     /**分页可能会用到
      *
      */

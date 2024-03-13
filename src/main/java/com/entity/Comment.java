@@ -7,9 +7,12 @@ import com.baomidou.mybatisplus.enums.IdType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -19,7 +22,6 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName("comment")
-@Builder
 public class Comment implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -89,6 +91,5 @@ public class Comment implements Serializable {
      */
     @TableField("create_time")
     private LocalDateTime createTime;
-
 
 }
